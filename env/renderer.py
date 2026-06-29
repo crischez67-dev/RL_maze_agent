@@ -41,6 +41,7 @@ class MazeRenderer:
             for col in range(self.env.cols):
                 self.draw_cell(row, col)
 
+        self.draw_sensors()
         self.draw_agent()
 
         pygame.display.flip()
@@ -84,6 +85,34 @@ class MazeRenderer:
             self.agent_color,
             (center_x, center_y),
             radius,
+        )
+    
+    def draw_sensors(self):
+        self.draw_sensor((-1, 0))  # arriba
+        self.draw_sensor((1, 0))   # abajo
+        self.draw_sensor((0, -1))  # izquierda
+        self.draw_sensor((0, 1))   # derecha
+
+    def draw_sensor(self, direction):
+        row, col = self.env.agent_pos
+
+        center_x = col * self.cell_size + self.cell_size // 2
+        center_y = row * self.cell_size + self.cell_size // 2
+
+        sensor_value = self.env.get_sensor_distance(direction)
+        distance_cells = sensor_value * 5
+
+        move_row, move_col = direction
+
+        end_x = center_x + move_col * distance_cells * self.cell_size
+        end_y = center_y + move_row * distance_cells * self.cell_size
+
+        pygame.draw.line(
+            self.screen,
+            (255, 120, 0),
+            (center_x, center_y),
+            (end_x, end_y),
+            5,
         )
 
     def tick(self, fps=30):
