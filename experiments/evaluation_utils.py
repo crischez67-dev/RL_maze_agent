@@ -1,7 +1,7 @@
 import csv
 import os
 
-def run_episode(env, agent):
+def run_episode(env, agent, epsilon=0.0):
     state = env.reset()
 
     done = False
@@ -10,7 +10,7 @@ def run_episode(env, agent):
     final_info = None
 
     while not done:
-        action = agent.select_action(state)
+        action = agent.select_action(state, epsilon=epsilon)
 
         next_state, reward, done, info = env.step(action)
 
@@ -24,7 +24,7 @@ def run_episode(env, agent):
 
     return step_count, total_reward, final_info, final_position
 
-def evaluate_agent(env, agent, output_file, num_episodes=100):
+def evaluate_agent(env, agent, output_file, num_episodes=100, epsilon=0.0):
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
     total_steps_all = 0
@@ -49,7 +49,11 @@ def evaluate_agent(env, agent, output_file, num_episodes=100):
         ])
 
         for episode in range(1, num_episodes + 1):
-            steps, total_reward, info, final_position = run_episode(env, agent)
+            steps, total_reward, info, final_position = run_episode(
+                env=env,
+                agent=agent,
+                epsilon=epsilon,
+            )
 
             final_row, final_col = final_position
 
