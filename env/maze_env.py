@@ -27,11 +27,12 @@ class MazeEnv:
         3: (0, 1),   # derecha
     }
 
-    def __init__(self, maze, start_pos, goal_pos, max_steps=100):
+    def __init__(self, maze, start_pos, goal_pos, max_steps=100, end_on_collision=True):
         self.maze = maze
         self.start_pos = start_pos
         self.goal_pos = goal_pos
         self.max_steps = max_steps
+        self.end_on_collision = end_on_collision
 
         self.rows = len(maze)
         self.cols = len(maze[0])
@@ -170,9 +171,15 @@ class MazeEnv:
 
         # Caso 1: choque contra pared
         if self.is_wall(new_pos):
-            reward = -50
-            done = True
+            reward = -10
+            done = self.end_on_collision
             info["collision"] = True
+
+            if self.steps >= self.max_steps:
+                done = True
+                info["timeout"] = True
+                reward -= 10
+
             return self.get_state(), reward, done, info
 
         # Movimiento válido
