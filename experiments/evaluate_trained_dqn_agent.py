@@ -23,7 +23,7 @@ agent = DQNAgent(
     learning_rate=0.001,
 )
 
-model_file = "checkpoints/dqn_agent.pth"
+model_file = "checkpoints/dqn_agent_target_network.pth"
 
 agent.q_network.load_state_dict(
     torch.load(model_file, map_location="cpu")
@@ -102,7 +102,7 @@ print(f"Colisiones promedio por episodio: {average_collision_count:.2f}")
 
 os.makedirs("results", exist_ok=True)
 
-output_file = "results/trained_dqn_agent_metrics.csv"
+output_file = "results/trained_dqn_agent_target_network_metrics.csv"
 
 with open(output_file, mode="w", newline="") as file:
     writer = csv.DictWriter(

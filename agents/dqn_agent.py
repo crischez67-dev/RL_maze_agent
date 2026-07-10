@@ -17,6 +17,15 @@ class DQNAgent:
             hidden_size=hidden_size,
         )
 
+        self.target_q_network = QNetwork(
+            state_size=state_size,
+            action_size=action_size,
+            hidden_size=hidden_size,
+        )
+
+        self.update_target_network()
+        self.target_q_network.eval()
+
         self.optimizer = optim.Adam(
             self.q_network.parameters(),
             lr=learning_rate,
@@ -56,7 +65,7 @@ class DQNAgent:
         selected_q_values = q_values.gather(1, actions)
 
         with torch.no_grad():
-            next_q_values = self.q_network(next_states)
+            next_q_values = self.target_q_network(next_states)
             max_next_q_values = next_q_values.max(dim=1, keepdim=True)[0]
             target_q_values = rewards + gamma * max_next_q_values * (1 - dones)
 
@@ -67,3 +76,6 @@ class DQNAgent:
         self.optimizer.step()
 
         return loss.item()
+
+    def update_target_network(self):
+        self.target_q_network.load_state_dict(self.q_network.state_dict())

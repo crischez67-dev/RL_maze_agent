@@ -44,6 +44,8 @@ epsilon = 1.0
 epsilon_min = 0.05
 epsilon_decay = 0.995
 
+target_update_frequency = 10
+
 results = []
 
 
@@ -89,6 +91,9 @@ for episode in range(1, num_episodes + 1):
 
     epsilon = max(epsilon_min, epsilon * epsilon_decay)
 
+    if episode % target_update_frequency == 0:
+        agent.update_target_network()
+
     average_loss = sum(losses) / len(losses) if losses else None
 
     episode_result = {
@@ -125,7 +130,7 @@ for episode in range(1, num_episodes + 1):
 
 os.makedirs("results", exist_ok=True)
 
-output_file = "results/dqn_training_metrics.csv"
+output_file = "results/dqn_training_metrics_target_network.csv"
 
 with open(output_file, mode="w", newline="") as file:
     writer = csv.DictWriter(
@@ -151,7 +156,7 @@ print(f"Métricas guardadas en: {output_file}")
 
 os.makedirs("checkpoints", exist_ok=True)
 
-model_file = "checkpoints/dqn_agent.pth"
+model_file = "checkpoints/dqn_agent_target_network.pth"
 torch.save(agent.q_network.state_dict(), model_file)
 
 print(f"Modelo guardado en: {model_file}")
